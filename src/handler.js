@@ -1,7 +1,7 @@
 const { nanoid } = require('nanoid');
 const notes = require('./notes');
 
-const addNoteHandler = (request, h) => {
+const addNoteHandler = (request,h) => {
   const { title, tags, body } = request.payload;
   const id = nanoid(6);
 
@@ -9,7 +9,7 @@ const addNoteHandler = (request, h) => {
   const updatedAt = createdAt;
 
   const note = {
-    title, tags, body, id, createdAt, updatedAt,
+    id, title, body, tags, createdAt, updatedAt,
   };
 
   notes.push(note);
@@ -38,20 +38,25 @@ const addNoteHandler = (request, h) => {
   return response;
 };
 
-const getNotesHandler = (request, h) => {
-  return notes;
-};
+const getNotesHandler = () => ({
+  status: 'success',
+  data: {
+    notes,
+  },
+});
 
 const getNoteDetailHandler = (request, h) => {
   const { id } = request.params;
   const note = notes.filter((note) => note.id === id)[0];
   if (note !== undefined) {
-    return {
+    const response = h.response({
       status: 'success',
       data: { note },
-    };
+    });
+    response.code(200);
+    return response;
   }
-
+  else{
   const response = h.response({
     status: 'gagal',
     message: 'Not Found',
@@ -59,6 +64,7 @@ const getNoteDetailHandler = (request, h) => {
 
   response.code(404);
   return response;
+}
 };
 
 const editNoteHandler = (request, h) => {
@@ -84,7 +90,7 @@ const editNoteHandler = (request, h) => {
     response.code(200);
     return response;
   }
-
+  else{
   const response = h.response({
     status: 'gagal',
     message: 'Not Found',
@@ -92,6 +98,7 @@ const editNoteHandler = (request, h) => {
 
   response.code(404);
   return response;
+}
 };
 
 const deleteNoteHandler = (request, h) => {
@@ -102,7 +109,7 @@ const deleteNoteHandler = (request, h) => {
     notes.splice(index, 1);
     const response = h.response({
       status: 'success',
-      message: 'Note successfully Edited',
+      message: 'Note successfully Removed',
     });
 
     response.code(200);
